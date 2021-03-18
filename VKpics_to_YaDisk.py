@@ -42,18 +42,18 @@ def put_pics(v_token, version, ya_token, user_id=None):
         name_and_size = {}
         big_pic = pic['sizes'][-1]['url']
         like_num = str(pic['likes']['count'])
-        like_num = like_num + '.jpg'
+        like_num_name = like_num + '.jpg'
 
-        if like_num in likes_links:
-            like_num = like_num[:-4] + '.1.jpg'
+        if like_num_name in likes_links:
+            like_num_name = like_num_name[:-4] + '.1.jpg'
 
-        likes_links.update({like_num: big_pic})
+        likes_links[like_num_name] = big_pic
 
         big_pic_height = pic['sizes'][-1]['height']
         big_pic_width = pic['sizes'][-1]['width']
 
         height_width.update({'height': big_pic_height, 'width': big_pic_width})
-        name_and_size.update({'file_name': like_num, 'size': height_width})
+        name_and_size.update({'file_name': like_num_name, 'size': height_width})
 
         sizes_links_json.append(name_and_size)
 
