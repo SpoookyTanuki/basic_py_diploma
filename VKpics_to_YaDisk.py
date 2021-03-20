@@ -1,7 +1,5 @@
 import requests
 import json
-import time
-from tqdm import tqdm
 
 with open('VK_token.txt') as file_object:
     vk_token = file_object.read().strip()
@@ -28,10 +26,12 @@ def put_pics(v_token, version, ya_token, user_id=None):
             'album_id': 'profile',
             'extended': 1
         }
-
+    print(f'Скачиваю информацию для профиля с id {user_id}')
     res_get = requests.get(all_pics, params={**params, **pics_params})
 
     pic_items = res_get.json()['response']['items']
+    print(f'Обнаружено {len(pic_items)} фотографий')
+
     album_id = str(pic_items[0]['album_id'])
 
     likes_links = {}
@@ -41,11 +41,12 @@ def put_pics(v_token, version, ya_token, user_id=None):
         height_width = {}
         name_and_size = {}
         big_pic = pic['sizes'][-1]['url']
-        like_num = str(pic['likes']['count'])
-        like_num_name = like_num + '.jpg'
+        for i in big_pic:
+            like_num = str(pic['likes']['count'])
+            like_num_name = like_num + '.jpg'
 
-        if like_num_name in likes_links:
-            like_num_name = like_num_name[:-4] + '.1.jpg'
+            if like_num_name in likes_links:
+                like_num_name = like_num_name[:-4] + '.1.jpg'
 
         likes_links[like_num_name] = big_pic
 
@@ -64,14 +65,19 @@ def put_pics(v_token, version, ya_token, user_id=None):
                             params={'path': album_id},
                             headers={'Authorization': f'OAuth {ya_token}'})
 
-    for k in likes_links:
-        response = requests.post('https://cloud-api.yandex.net/v1/disk/resources/upload',
-                                  params={'url': likes_links[k],
-                                          'path': f'/{album_id}/{k}'},
-                                  headers={'Authorization': f'OAuth {ya_token}'})
+    print('Начинаю загрузку на Yandex Disk')
 
-    for i in tqdm(likes_links):
-        time.sleep(1)
+    count = 1
+    for k in likes_links:
+
+        response = requests.post('https://cloud-api.yandex.net/v1/disk/resources/upload',
+                                 params={'url': likes_links[k],
+                                         'path': f'/{album_id}/{k}'},
+                                 headers={'Authorization': f'OAuth {ya_token}'})
+        print(f'{count} фото из {len(likes_links)} отправлено на загрузку')
+        count += 1
+
+    print('Все фотографии загружены')
 
     return response
 
