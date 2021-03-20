@@ -56,7 +56,7 @@ def put_pics(v_token, version, ya_token, user_id=None):
         height_width.update({'height': big_pic_height, 'width': big_pic_width})
         name_and_size.update({'file_name': like_num_name, 'size': height_width})
 
-        sizes_links_json.append(name_and_size)
+
 
     with open('vk_pics.json', 'w') as f:
         json.dump(sizes_links_json, f)
@@ -83,3 +83,6 @@ def put_pics(v_token, version, ya_token, user_id=None):
 
 
 put_pics(vk_token, '5.126', yadisk_token)
+
+
+
